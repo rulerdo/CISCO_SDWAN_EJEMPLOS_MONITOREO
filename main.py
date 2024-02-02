@@ -179,7 +179,7 @@ def dump_events_csv(data, filename, pattern="."):
         csv_writer.writerow(headers)
         csv_writer.writerows(values)
 
-    print(f"Archivo {filename} guardado!")
+    print(f"Archivo {filename} guardado!\n")
 
 
 if __name__ == '__main__':
@@ -247,8 +247,7 @@ if __name__ == '__main__':
     if query:
         response = session.send_request(action="POST", resource="/event", body=query)
         data = response.json()["data"]
-        print("Payload:")
-        print(query)
+        # print("Payload:","\n",query,"\n")
         dump_events_csv(data, "reporte_tunneles_SIG.csv", "SDWAN-CJF-774-RT01")
 
     # Monitoreo de Eventos - Sesiones BFD abajo
@@ -257,8 +256,7 @@ if __name__ == '__main__':
     if query:
         response = session.send_request(action="POST", resource="/event", body=query)
         data = response.json()["data"]
-        print("Payload:")
-        print(query)
+        # print("Payload:","\n",query,"\n")
         dump_events_csv(data, "reporte_bfd.csv", "new-state=down")
 
     # Desconexion de vManage

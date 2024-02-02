@@ -44,13 +44,13 @@ class sdwan_manager:
 
         token = response.text
         if token:
-            print(f"Connected to vManage! {self.host}\n")
+            print(f"Conectado a vManage! {self.host}\n")
 
         return token
 
     def send_request(self, action, resource, body):
 
-        print("Obtaining resource:", resource)
+        print("Obteniendo recurso:", resource)
         url = f"https://{self.host}/dataservice{resource}"
 
         headers = {
@@ -80,8 +80,8 @@ class sdwan_manager:
         )
 
         message = (
-            "vManage session closed!"
+            "Sesion a vManage cerrada!"
             if response.status_code == 200
-            else "Problems closing session"
+            else "Problemas cerrando sesion"
         )
         print(message)
