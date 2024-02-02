@@ -35,6 +35,7 @@ def parse_tunnels_down(data):
         "vdevice-host-name",
         "vdevice-name",
         "site-id",
+        "destination-data-center",
         "device-state",
         "sig-state",
     ]
@@ -203,6 +204,7 @@ if __name__ == '__main__':
             "hostname",
             "system-ip",
             "site-id",
+            "destination-dc",
             "device-state",
             "sig-state",
             "lastupdated",
@@ -248,7 +250,7 @@ if __name__ == '__main__':
         response = session.send_request(action="POST", resource="/event", body=query)
         data = response.json()["data"]
         # print("Payload:","\n",query,"\n")
-        dump_events_csv(data, "reporte_tunneles_SIG.csv", "SDWAN-CJF-774-RT01")
+        dump_events_csv(data, "reporte_tunneles_SIG.csv")
 
     # Monitoreo de Eventos - Sesiones BFD abajo
     
