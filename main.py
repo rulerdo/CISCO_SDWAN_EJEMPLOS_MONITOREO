@@ -27,7 +27,17 @@ def convert_epoch_to_human(epoch_time):
     return human_readable_time
 
 
-def parse_tunnels_down(data):
+def find_chassis_number(hostname,all_device_details):
+    
+    chassisNumber = None
+    for details in all_device_details:
+        if hostname == details.get("host-name"):
+            chassisNumber = details.get("chasisNumber")
+
+    return chassisNumber
+
+
+def parse_tunnels_down(data,all_device_details):
 
     inactive_tunnels = []
     system_ips = set()
@@ -42,11 +52,14 @@ def parse_tunnels_down(data):
 
     for t in data:
 
-        epochtime = int(str(t.get("lastupdated"))[:-3])
-        human_readable_time = convert_epoch_to_human(epochtime)
         if t.get("sig-state") in ["DOWN"] and t.get("device-state") in ["Down"]:
+            
+            epochtime = int(str(t.get("lastupdated"))[:-3])
+            human_readable_time = convert_epoch_to_human(epochtime)
+            chassis_number = find_chassis_number(t.get("vdevice-host-name"),all_device_details)
             tunnel = [t.get(title) for title in titles]
             tunnel.append(human_readable_time)
+            tunnel.append(chassis_number)
             inactive_tunnels.append(tunnel)
             system_ips.add(t.get("vdevice-name"))
 
@@ -190,13 +203,20 @@ if __name__ == '__main__':
     host, port, user, pwd = get_vmanage_credentials()
     session = sdwan_manager(host, port, user, pwd)
 
+    # Obtener detalles de todos los equipos del Overlay
+    
+    response = session.send_request(
+        action="GET", resource="/device/vedgeinventory/detail", body={}
+    )
+    all_device_details = response.json()["data"]
+
     # Monitoreo de Tunneles SIG
 
     response = session.send_request(
         action="GET", resource="/device/sig/getSigTunnelList", body={}
     )
     data = response.json()["data"]
-    inactive_tunnels, system_ips = parse_tunnels_down(data)
+    inactive_tunnels, system_ips = parse_tunnels_down(data,all_device_details)
     sig_tunnels_table = tabulate(
         inactive_tunnels,
         tablefmt="pretty",
@@ -208,6 +228,7 @@ if __name__ == '__main__':
             "device-state",
             "sig-state",
             "lastupdated",
+            "chassis_number",
         ],
     )
     print(sig_tunnels_table, "\n")
